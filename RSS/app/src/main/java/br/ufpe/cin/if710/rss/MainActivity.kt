@@ -1,7 +1,10 @@
 package br.ufpe.cin.if710.rss
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
 import java.io.IOException
@@ -13,6 +16,14 @@ import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import kotlinx.android.synthetic.main.itemlista.view.*
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import android.support.v7.widget.DividerItemDecoration
 
 
 
@@ -23,9 +34,9 @@ import android.support.v7.widget.LinearLayoutManager
 
 class MainActivity : Activity() {
 
-    private val RSS_FEED = "http://leopoldomt.com/if1001/g1brasil.xml"
+   // private val RSS_FEED = "http://leopoldomt.com/if1001/g1brasil.xml"
 
-    var feedRSS: List<ItemRSS> = emptyList()
+   // var feedRSS: List<ItemRSS> = emptyList()
 
 
     // private var conteudoRSS: TextView? = null
@@ -53,9 +64,10 @@ class MainActivity : Activity() {
     override fun onStart() {
         super.onStart()
 
+        getRssFeed(getString(R.string.rssfeed))
 
 
-        try {
+      /*  try {
             //doAsync para o app não bugar ao carregar o RSS_FEED
 
 
@@ -64,9 +76,9 @@ class MainActivity : Activity() {
             doAsync {
 
                 //Passando o link para o getRssFeed
+               // val feedRSS: List<ItemRSS> = ParserRSS.parse(getRssFeed(getString(R.string.rssfeed)))
 
-                val feedXML = getRssFeed(getString(R.string.rssfeed))
-                feedRSS = ParserRSS.parse(feedXML)
+                //  val XML =
 
                 //Log.i("TESTE", "bbbbb")
                 //Faz as alterações da interface depois de ter o dados
@@ -83,19 +95,70 @@ class MainActivity : Activity() {
             }
         } catch (e: IOException) {
             e.printStackTrace()
-        }
+        }*/
 
     }
 
 
 
     //Solução para a tradução da fun getRssFeed para Kotlin
-    private fun getRssFeed(feed: String): String {
+   /* private fun getRssFeed(feed: String): String {
         return URL(feed).readText()
+    }*/
+
+    //@Throws(IOException::class)
+    private fun getRssFeed(feed: String) {
+
+        //doAsync para o app não bugar ao carregar o RSS_FEED
+
+        doAsync {
+
+
+
+            var `in`: InputStream? = null
+            var rssFeed = ""
+            try {
+                val url = URL(feed)
+                val conn = url.openConnection() as HttpURLConnection
+                `in` = conn.inputStream
+                val out = ByteArrayOutputStream()
+                val buffer = ByteArray(1024)
+                var count: Int = `in`!!.read(buffer)
+//                println("print" + count)
+                while (count != -1) {
+                    out.write(buffer, 0, count)
+                    count = `in`!!.read(buffer)
+                }
+                val response = out.toByteArray()
+                rssFeed = String(response)
+
+                uiThread {
+                    //Log.i("MSG", "AAAAAA")
+
+
+                    //recebendo o link e passando para o Parse e atribuindo ao feed
+                    val feed: List<ItemRSS> = ParserRSS.parse(rssFeed)
+
+                    conteudoRSS.backgroundColor = Color.rgb(130, 212, 247)
+                }
+
+
+            } catch (e: IOException){
+                e.printStackTrace()
+
+            } finally {
+                `in`?.close()
+            }
+            //  return rssFeed
+
+        }
+
+
     }
 
 
 }
+
 
 
 
