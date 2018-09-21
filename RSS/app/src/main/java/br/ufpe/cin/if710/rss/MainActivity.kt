@@ -25,9 +25,10 @@ class MainActivity : Activity() {
 
     private val RSS_FEED = "http://leopoldomt.com/if1001/g1brasil.xml"
 
-    var feedRSS = ""
+    var feedRSS: List<ItemRSS> = emptyList()
 
-   // private var conteudoRSS: TextView? = null
+
+    // private var conteudoRSS: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +40,7 @@ class MainActivity : Activity() {
 
         conteudoRSS.layoutManager = LinearLayoutManager(this)
 
+       // Log.d("TESTE-RSSFEED", getString(R.string.rssfeed))
 
     }
 
@@ -51,16 +53,20 @@ class MainActivity : Activity() {
     override fun onStart() {
         super.onStart()
 
-        val feedXML = getRssFeed(getString(R.string.rssfeed))
+
 
         try {
             //doAsync para o app não bugar ao carregar o RSS_FEED
 
+
+
+
             doAsync {
 
-                    //Passando o link para o getRssFeed
+                //Passando o link para o getRssFeed
 
-
+                val feedXML = getRssFeed(getString(R.string.rssfeed))
+                feedRSS = ParserRSS.parse(feedXML)
 
                 //Log.i("TESTE", "bbbbb")
                 //Faz as alterações da interface depois de ter o dados
