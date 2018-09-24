@@ -49,9 +49,14 @@ class MainActivity : Activity() {
 
        // conteudoRSS!!.text = "bbbb"
 
+
+        //Responsavel por posicionar os itens na Layout Manager
         conteudoRSS.layoutManager = LinearLayoutManager(this)
 
-       // Log.d("TESTE-RSSFEED", getString(R.string.rssfeed))
+
+        conteudoRSS.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+
+        // Log.d("TESTE-RSSFEED", getString(R.string.rssfeed))
 
     }
 
@@ -139,7 +144,10 @@ class MainActivity : Activity() {
                     //recebendo o link e passando para o Parse e atribuindo ao feed
                     val feed: List<ItemRSS> = ParserRSS.parse(rssFeed)
 
-                    conteudoRSS.backgroundColor = Color.rgb(130, 212, 247)
+                    conteudoRSS.adapter = Adapter(feed, this@MainActivity)
+
+
+                    // conteudoRSS.backgroundColor = Color.rgb(130, 212, 247)
                 }
 
 
@@ -159,6 +167,43 @@ class MainActivity : Activity() {
 
 }
 
+//Criando o Adapter
+class Adapter (private val dados: List<ItemRSS>, private val context : Context) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
+    override fun getItemCount(): Int {
+        return dados.size
+    }
+
+    //Mostra os dados solicitados
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)  {
+
+        val title = itemView.item_titulo
+        val conteudo = itemView.item_data
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(context).inflate(R.layout.itemlista, parent, false)
+        return ViewHolder(view)
+    }
+
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val  dado = dados[position]
+
+        //preenchendo os dados da tabela
+        holder.title.text = dado.title
+        holder.conteudo.text = dado.description
+
+        //Colocando o direcionamento do link para o titulo da tabela
+        holder.title.setOnClickListener {
+            context.startActivity( Intent (Intent.ACTION_VIEW,  Uri.parse(dado.link) ))
+        }
+
+
+    }
+
+
+}
 
 
